@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Icono de la app. Mismos colores que css/style.css (:root) y el mismo
+       toldo que corona la portada y los anaqueles del juego.
+       Para cambiarlo: edita este archivo y corre  npm run icono  -->
+  <defs>
+    <clipPath id="marco">
+      <rect x="16" y="16" width="224" height="224" rx="48"/>
+    </clipPath>
+  </defs>
+
+  <!-- Fondo -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="#FFF9EF"/>
+
+  <g clip-path="url(#marco)">
+    <!-- Cielo del mercado -->
+    <rect x="16" y="16" width="224" height="104" fill="#EAF4FF"/>
+
+    <!-- Toldo: franjas rojas y crema, con el borde ondulado de siempre -->
+    <path d="M16 16h224v70H16z" fill="#FF7B7B"/>
+    <g fill="#FFF9EF">
+      <path d="M48 16h32v70H48zM112 16h32v70h-32zM176 16h32v70h-32z"/>
+    </g>
+    <path d="M16 86h224v0c-16 0-16 22-32 22s-16-22-32-22-16 22-32 22-16-22-32-22-16 22-32 22-16-22-32-22-16 22-32 22V86z" fill="#E15A5A"/>
+    <path d="M16 86h224v6H16z" fill="#E15A5A"/>
+
+    <!-- Moneda de $500: el gesto central del juego es reconocer el dinero -->
+    <circle cx="128" cy="168" r="52" fill="#E0B884"/>
+    <circle cx="128" cy="164" r="52" fill="#FFB259"/>
+    <circle cx="128" cy="164" r="41" fill="#F5A244"/>
+    <circle cx="128" cy="164" r="41" fill="none" stroke="#E08E33" stroke-width="3"/>
+
+    <!-- El signo peso, dibujado con trazos para que se lea a 16 px -->
+    <g stroke="#FFF9EF" stroke-width="11" stroke-linecap="round" fill="none">
+      <path d="M128 134v60"/>
+      <path d="M146 148c0-8-8-13-18-13s-18 5-18 13 8 12 18 15 18 7 18 15-8 13-18 13-18-5-18-13"/>
+    </g>
+  </g>
+
+  <!-- Borde suave, para que no se funda con fondos claros -->
+  <rect x="16" y="16" width="224" height="224" rx="48" fill="none" stroke="#DEEAF3" stroke-width="4"/>
+</svg>

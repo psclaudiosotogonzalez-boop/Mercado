@@ -1,0 +1,65 @@
+{
+  "name": "mercado",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Mercado — juego de manejo de dinero chileno (Escuela Rural Osvaldo Hiriart Corvalán, Botalcura)",
+  "author": "Claudio Soto González",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "construir": "python construir.py",
+    "icono": "electron electron/hacer-icono.cjs",
+    "app:carpeta": "electron-builder --win --dir",
+    "app": "electron-builder --win nsis",
+    "publicar": "electron-builder --win nsis --publish always"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "electron": "^32.3.3",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "cl.escuelaosvaldohiriart.mercado",
+    "productName": "Mercado",
+    "copyright": "Escuela Rural Osvaldo Hiriart Corvalán · Botalcura",
+    "files": [
+      "electron/**",
+      "Mercado (archivo unico).html"
+    ],
+    "extraResources": [
+      "aula"
+    ],
+    "directories": {
+      "output": "instalador",
+      "buildResources": "electron"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "electron/icono.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Mercado"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "psclaudiosotogonzalez-boop",
+        "repo": "Mercado",
+        "releaseType": "release"
+      }
+    ]
+  },
+  "allowScripts": {
+    "electron@32.3.3": true
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/psclaudiosotogonzalez-boop/Mercado.git"
+  }
+}

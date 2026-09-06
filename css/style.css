@@ -1,0 +1,1404 @@
+/* ============================================================================
+   style.css — Mercado: manejo de dinero
+   ----------------------------------------------------------------------------
+   Dirección visual: aplicación infantil moderna sobre la feria libre chilena.
+   Pasteles claros, tarjetas grandes y muy redondeadas, sombras suaves y
+   botones con relieve que se hunden al tocarlos. El toldo a rayas sobre cada
+   anaquel es el elemento que da identidad; la boleta impresa cierra la partida.
+
+   Pensado para el dedo antes que para el mouse: nada depende del hover, las
+   zonas táctiles nunca bajan de 56 px y no hay retardo al tocar.
+   ========================================================================== */
+
+/* --- Fichas de diseño ----------------------------------------------------- */
+:root {
+  /* Color: pasteles claros con acentos vivos pero suaves */
+  --cielo:       #EAF4FF;   /* fondo                          */
+  --cielo-hondo: #D4E9FF;
+  --nube:        #FFFFFF;   /* tarjetas                       */
+  --crema:       #FFF9EF;   /* cajones de la feria            */
+
+  --menta:       #43C9A0;   /* verde claro: solo decorativo   */
+  --menta-osc:   #2BA381;   /* relieve bajo el verde claro    */
+  /* El blanco sobre el verde claro solo alcanza 2:1 de contraste. Estos dos
+     tonos profundos se usan donde hay texto encima, y así todo el texto del
+     juego cumple el mínimo AA sin perder el aire pastel del conjunto. */
+  --menta-hondo: #147A5C;   /* fondo con texto blanco         */
+  --menta-relieve: #0E5B44; /* relieve del verde profundo     */
+  --menta-texto: #147054;   /* verde sobre fondo claro        */
+  --durazno:     #FFB259;   /* acción principal, precios      */
+  --durazno-osc: #E08E33;
+  --frutilla:    #FF7B7B;   /* quitar, alertas                */
+  --frutilla-osc:#E15A5A;
+  --uva:         #A98CF0;   /* foco de teclado                */
+  --limon:       #FFE172;
+  --madera:      #E0B884;   /* borde de los cajones           */
+
+  --tinta:       #3A4A5C;   /* texto: azul grisáceo, no negro */
+  --tinta-cl:    #59697D;   /* gris secundario legible        */
+  --linea:       #DEEAF3;
+
+  /* Tipografía */
+  --display: ui-rounded, "Baloo 2", "Nunito", "Quicksand", "Trebuchet MS", system-ui, sans-serif;
+  --texto:   ui-rounded, "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Forma */
+  --r-s: 14px;
+  --r-m: 22px;
+  --r-l: 32px;
+
+  /* Sombras suaves y difusas */
+  --sombra-s: 0 3px 10px rgba(58, 74, 92, .08);
+  --sombra-m: 0 8px 24px rgba(58, 74, 92, .10);
+  --sombra-l: 0 18px 44px rgba(58, 74, 92, .16);
+
+  /* Ritmo */
+  --hueco: 20px;
+  --toque: 60px;            /* alto mínimo de zona táctil */
+}
+
+html { font-size: 18px; }
+html.texto-grande { font-size: 21px; }
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--texto);
+  color: var(--tinta);
+  background: var(--cielo);
+  background-image:
+    radial-gradient(ellipse 70% 50% at 15% 0%, #FFFFFF 0%, transparent 60%),
+    radial-gradient(ellipse 60% 45% at 85% 8%, #E8F7FF 0%, transparent 60%),
+    linear-gradient(180deg, var(--cielo) 0%, var(--cielo-hondo) 100%);
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Nada de retardo ni selección accidental en lo que se toca */
+button, .plata, .producto, .nivel, .seccion-tab, .tecla, .opcion, .picker__item, .galeria__ficha {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+h1, h2, h3, .display { font-family: var(--display); letter-spacing: .2px; }
+h1 { font-size: 2.8rem; margin: 0; }
+h2 { font-size: 1.9rem; margin: 0 0 .5em; color: #2C7E86; }
+h3 { font-size: 1.25rem; margin: 0 0 .4em; }
+
+.cifra { font-variant-numeric: tabular-nums; font-family: var(--display); }
+
+/* --- Pantallas ------------------------------------------------------------ */
+.pantalla { display: none; min-height: 100vh; }
+.pantalla.activa { display: block; animation: entrar .34s cubic-bezier(.22,1,.36,1) both; }
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(18px) scale(.99); }
+  to   { opacity: 1; transform: none; }
+}
+
+.envoltorio { max-width: 1180px; margin: 0 auto; padding: clamp(18px, 3vw, 36px); }
+
+/* --- Botones con relieve -------------------------------------------------- */
+/* Se hunden al presionar: el gesto se siente físico, funciona igual con dedo
+   que con mouse y no depende del hover. */
+.btn {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  min-height: var(--toque);
+  padding: 0 28px;
+  border: 0;
+  border-radius: var(--r-m);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--nube);
+  color: var(--tinta);
+  box-shadow: 0 5px 0 #D3E2EE, var(--sombra-s);
+  transition: transform .1s ease, box-shadow .1s ease, filter .18s ease;
+}
+.btn:active { transform: translateY(5px); box-shadow: 0 0 0 #D3E2EE, var(--sombra-s); }
+.btn:focus-visible { outline: 4px solid var(--uva); outline-offset: 3px; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; transform: none; }
+@media (hover: hover) { .btn:hover { filter: brightness(1.04); } }
+
+.btn--principal { background: var(--durazno); color: #5A3300; box-shadow: 0 5px 0 var(--durazno-osc), var(--sombra-s); }
+.btn--principal:active { box-shadow: 0 0 0 var(--durazno-osc), var(--sombra-s); }
+.btn--verde { background: var(--menta-hondo); color: #FFF; box-shadow: 0 5px 0 var(--menta-relieve), var(--sombra-s); }
+.btn--verde:active { box-shadow: 0 0 0 var(--menta-relieve), var(--sombra-s); }
+.btn--peligro { background: var(--frutilla); color: #FFF; box-shadow: 0 5px 0 var(--frutilla-osc), var(--sombra-s); }
+.btn--peligro:active { box-shadow: 0 0 0 var(--frutilla-osc), var(--sombra-s); }
+.btn--fantasma { background: rgba(255,255,255,.88); }
+
+.btn--grande { font-size: 1.4rem; min-height: 74px; padding: 0 40px; border-radius: var(--r-l); }
+.btn--chico { font-size: 1rem; min-height: 48px; padding: 0 18px; border-radius: var(--r-s); box-shadow: 0 4px 0 #D3E2EE; }
+.btn--chico:active { transform: translateY(4px); box-shadow: 0 0 0 #D3E2EE; }
+
+/* --- Menú principal ------------------------------------------------------- */
+/* Con cinco botones el menú rozaba el borde en pantallas de 800 px de alto:
+   los espacios se ajustan a la altura disponible para que quepa siempre. */
+.portada { text-align: center; padding-top: clamp(8px, 2vh, 36px); }
+
+/* Toldo de feria: la firma visual del juego */
+.toldo {
+  height: 38px;
+  border-radius: var(--r-l) var(--r-l) 0 0;
+  background: repeating-linear-gradient(90deg, var(--menta) 0 30px, #FFFFFF 30px 60px);
+  position: relative;
+}
+.toldo::after {
+  content: "";
+  position: absolute; inset: auto 0 -13px 0;
+  height: 14px;
+  background: repeating-linear-gradient(90deg, var(--menta) 0 30px, #FFFFFF 30px 60px);
+  -webkit-mask-image: radial-gradient(circle at 15px 0, transparent 0 15px, #000 15px);
+          mask-image: radial-gradient(circle at 15px 0, transparent 0 15px, #000 15px);
+  -webkit-mask-size: 30px 14px;
+          mask-size: 30px 14px;
+}
+
+.portada__marco {
+  max-width: 700px;
+  margin: 0 auto;
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: var(--sombra-l);
+  overflow: hidden;
+}
+.portada__cuerpo { padding: clamp(18px, 3vh, 38px) 30px clamp(16px, 2.5vh, 30px); }
+.portada__titulo {
+  font-size: clamp(2.6rem, 8vw, 4rem);
+  line-height: 1.02;
+  color: var(--menta-texto);
+  text-shadow: 0 3px 0 #D8F3E9;
+}
+.portada__bajada { color: var(--tinta-cl); font-size: 1.1rem; margin: 10px 0 clamp(14px, 2.4vh, 26px); line-height: 1.4; }
+
+.menu-botones { display: grid; gap: clamp(8px, 1.3vh, 14px); max-width: 420px; margin: 0 auto; }
+.pie { text-align: center; color: var(--tinta-cl); font-size: .9rem; margin-top: clamp(14px, 2.5vh, 26px); }
+
+/* --- Encabezado de pantallas internas ------------------------------------- */
+.encabezado { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 26px; }
+.encabezado__hueco { flex: 1; }
+
+/* --- Tarjetas de nivel ---------------------------------------------------- */
+.niveles { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.nivel {
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: 0 8px 0 #D9E8F2, var(--sombra-m);
+  padding: 0 0 26px;
+  cursor: pointer;
+  border: 0;
+  text-align: left;
+  font: inherit;
+  overflow: hidden;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.nivel:active { transform: translateY(8px); box-shadow: 0 0 0 #D9E8F2, var(--sombra-m); }
+.nivel:focus-visible { outline: 4px solid var(--uva); outline-offset: 3px; }
+.nivel__cuerpo { padding: 26px 24px 0; }
+.nivel__emoji { font-size: 3.4rem; line-height: 1; display: block; margin-bottom: 12px; }
+.nivel__num {
+  font-family: var(--display); font-size: .8rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--tinta-cl);
+}
+.nivel__nombre { font-family: var(--display); font-size: 1.6rem; color: var(--menta-texto); margin: 3px 0 10px; }
+.nivel__lema { color: var(--tinta-cl); font-size: 1rem; line-height: 1.45; }
+.nivel--reto { background: linear-gradient(170deg, #FFF6DC, var(--nube) 70%); }
+
+/* --- Paneles y formularios ------------------------------------------------ */
+.panel {
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: var(--sombra-m);
+  padding: 28px;
+  margin-bottom: 22px;
+}
+.panel h3 { color: var(--menta-texto); font-size: 1.35rem; }
+.panel__nota { color: var(--tinta-cl); font-size: .98rem; margin: -4px 0 20px; line-height: 1.5; }
+
+.campo { display: block; margin-bottom: 20px; }
+.campo__rotulo { display: block; font-weight: 800; margin-bottom: 8px; }
+.campo__pista { color: var(--tinta-cl); font-size: .92rem; margin-top: 6px; line-height: 1.45; }
+
+.entrada {
+  width: 100%;
+  min-height: var(--toque);
+  font: 800 1.2rem var(--display);
+  padding: 0 18px;
+  border: 3px solid var(--linea);
+  border-radius: var(--r-m);
+  background: #FBFDFF;
+  color: var(--tinta);
+}
+.entrada:focus { outline: none; border-color: var(--menta); background: #fff; }
+.entrada[disabled] { background: #F0F5F9; color: var(--tinta-cl); }
+
+.interruptor { display: flex; align-items: center; gap: 14px; min-height: 52px; cursor: pointer; }
+.interruptor input { width: 30px; height: 30px; accent-color: var(--menta); flex: none; }
+
+.opciones { display: flex; gap: 12px; flex-wrap: wrap; }
+.opcion {
+  flex: 1 1 140px; min-height: var(--toque);
+  border: 3px solid var(--linea); border-radius: var(--r-m);
+  background: #fff; font: 800 1.05rem var(--display); color: var(--tinta);
+  cursor: pointer; transition: transform .1s ease;
+}
+.opcion:active { transform: scale(.97); }
+.opcion.elegida { background: var(--menta-hondo); color: #fff; border-color: var(--menta-relieve); }
+
+.picker { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+.picker { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+.picker__item {
+  border: 3px solid var(--linea); border-radius: var(--r-m); background: #fff;
+  padding: 8px 8px 10px; text-align: center;
+}
+.picker__item.elegida { border-color: var(--menta); background: #E9FAF4; }
+
+.picker__tocar {
+  width: 100%; border: 0; background: none; padding: 4px 0; cursor: pointer;
+  font: inherit; display: block;
+}
+.picker__tocar svg { width: 52px; height: 52px; display: block; margin: 0 auto; }
+.picker__tocar span { font-size: .84rem; font-weight: 800; display: block; line-height: 1.2; }
+.picker__tocar:active { transform: scale(.95); }
+.picker__tocar:focus-visible { outline: 3px solid var(--uva); outline-offset: 2px; border-radius: var(--r-s); }
+
+/* Elegir cómo se vende el producto (solo en el súper reto) */
+.picker__modos { display: flex; gap: 4px; margin: 6px 0 4px; }
+.picker__modo {
+  flex: 1 1 0; min-width: 0; min-height: 32px; padding: 0 2px;
+  border: 2px solid var(--linea); border-radius: 9px; background: #fff;
+  font: 800 .72rem var(--display); color: var(--tinta-cl); cursor: pointer;
+}
+.picker__modo.elegida { background: var(--menta-hondo); color: #fff; border-color: var(--menta-relieve); }
+
+/* Cuántas unidades o cuántos gramos se piden */
+.picker__cuanto {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  margin-top: 6px; background: #fff; border-radius: 999px; padding: 3px;
+  border: 2px solid var(--linea);
+}
+.picker__paso {
+  width: 34px; height: 34px; flex: none; border: 0; border-radius: 50%;
+  background: var(--menta-hondo); color: #fff;
+  font: 900 1.15rem var(--display); line-height: 1; cursor: pointer;
+}
+.picker__paso[disabled] { background: #CBDCE6; }
+.picker__paso:active { transform: scale(.9); }
+.picker__valor {
+  flex: 1 1 auto; min-width: 0;
+  font: 800 .82rem var(--display); font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.picker__cuanto--fijo {
+  justify-content: center; color: var(--tinta-cl);
+  font: 700 .78rem var(--texto); padding: 8px 6px; background: #F7FAFD;
+}
+
+/* --- Mercado: estructura -------------------------------------------------- */
+.mercado {
+  display: grid;
+  grid-template-columns: 252px minmax(0, 1fr) 296px;
+  gap: 16px;
+  align-items: start;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 16px clamp(10px, 1.6vw, 20px) 24px;
+}
+
+/* Sin esto, el contenido del centro empuja la grilla y aparece la barra de
+   desplazamiento horizontal: los elementos de una grilla no encogen por
+   debajo de su ancho mínimo salvo que se les indique explícitamente. */
+.mercado > * { min-width: 0; }
+
+.columna-izq { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.barra {
+  position: sticky; top: 0; z-index: 30;
+  background: var(--menta-hondo);
+  color: #fff;
+  padding: 12px clamp(12px, 2vw, 24px);
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  box-shadow: 0 5px 0 var(--menta-relieve), var(--sombra-m);
+  margin-bottom: 8px;
+}
+.barra__hueco { flex: 1; }
+.barra .btn { min-height: 50px; box-shadow: 0 4px 0 rgba(0,0,0,.16); }
+.barra .btn:active { box-shadow: 0 0 0 rgba(0,0,0,.16); }
+
+.medidor { min-width: 220px; }
+.medidor__cifras {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--display); font-size: .85rem; opacity: .92;
+}
+.medidor__gastado { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.medidor__riel { height: 14px; border-radius: 999px; margin-top: 6px; background: rgba(0,0,0,.18); overflow: hidden; }
+.medidor__lleno {
+  height: 100%; width: 0; border-radius: 999px; background: #FFFFFF;
+  transition: width .45s cubic-bezier(.34,1.4,.5,1), background .3s;
+}
+.medidor--medio .medidor__lleno { background: var(--limon); }
+.medidor--alto  .medidor__lleno { background: var(--frutilla); }
+
+/* --- Lista de compras ----------------------------------------------------- */
+.lista {
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: var(--sombra-m);
+  padding: 26px 20px 20px;
+  position: relative;
+}
+.lista::before {
+  content: ""; position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 26px; border-radius: 8px;
+  background: linear-gradient(#C9D8E4, #9DB0C0);
+  box-shadow: var(--sombra-s);
+}
+.lista h3 { text-align: center; color: var(--menta-texto); margin-bottom: 16px; }
+
+.lista__item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 6px;
+  border-bottom: 3px dashed var(--linea);
+}
+.lista__item:last-child { border-bottom: 0; }
+
+/* Línea que el estudiante puede marcar por su cuenta */
+.lista__item--tocable {
+  width: 100%; border: 0; background: none; font: inherit; color: inherit;
+  text-align: left; cursor: pointer; border-radius: var(--r-s);
+  border-bottom: 3px dashed var(--linea);
+  transition: background .14s ease, transform .1s ease;
+}
+.lista__item--tocable:active { transform: scale(.97); background: #EAF4FF; }
+.lista__item--tocable:focus-visible { outline: 4px solid var(--uva); outline-offset: 2px; }
+.lista__item--tocable .lista__marca { transition: background .18s ease, border-color .18s ease; }
+@media (hover: hover) { .lista__item--tocable:hover { background: #F4F9FD; } }
+
+.lista__pista {
+  color: var(--tinta-cl); font-size: .86rem; line-height: 1.4;
+  text-align: center; margin: 12px 0 0;
+}
+.lista__marca {
+  width: 32px; height: 32px; flex: none;
+  border: 4px solid #CFDFEB; border-radius: 10px;
+  display: grid; place-items: center;
+  font-weight: 900; color: #fff; font-size: 1.15rem;
+}
+.lista__texto { font-weight: 800; line-height: 1.3; }
+.lista__donde { display: block; font-weight: 600; font-size: .84rem; color: var(--tinta-cl); }
+.lista__item.cumplida .lista__marca { background: var(--menta); border-color: var(--menta); }
+.lista__item.cumplida .lista__marca::after { content: "✓"; }
+.lista__item.cumplida .lista__texto { text-decoration: line-through; color: var(--tinta-cl); }
+
+/* --- Anaqueles ------------------------------------------------------------ */
+.secciones { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 14px; }
+.seccion-tab {
+  flex: none; min-height: 56px; padding: 0 20px;
+  border: 0; border-radius: var(--r-m); cursor: pointer;
+  font: 800 1.05rem var(--display);
+  background: var(--nube); color: var(--tinta);
+  box-shadow: 0 4px 0 #D9E8F2;
+  display: inline-flex; align-items: center; gap: 9px;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.seccion-tab:active { transform: translateY(4px); box-shadow: 0 0 0 #D9E8F2; }
+.seccion-tab.activa { background: var(--menta-hondo); color: #fff; box-shadow: 0 4px 0 var(--menta-relieve); }
+.seccion-tab__punto { width: 11px; height: 11px; border-radius: 50%; background: var(--frutilla); display: none; }
+.seccion-tab.tiene-pedido .seccion-tab__punto { display: block; }
+
+.anaquel { background: var(--nube); border-radius: var(--r-l); box-shadow: var(--sombra-m); overflow: hidden; }
+.anaquel__toldo { height: 30px; }
+.anaquel__grilla {
+  display: grid; gap: 14px; padding: 18px 16px;
+  grid-template-columns: repeat(auto-fill, minmax(164px, 1fr));
+  /* Sin esto, al ser la grilla un elemento flexible con altura definida, sus
+     filas se reparten el alto disponible y aplastan las tarjetas: el precio y
+     los botones quedaban cortados. Con max-content cada fila mide lo que su
+     contenido necesita y la grilla se desplaza por dentro si hace falta. */
+  grid-auto-rows: max-content;
+}
+
+/* Cada producto vive en un cajón de feria */
+.producto {
+  background: var(--crema);
+  border-radius: var(--r-m);
+  box-shadow: 0 6px 0 var(--madera);
+  padding: 16px 10px 18px;
+  overflow: hidden;          /* nada puede salirse del cajón */
+  text-align: center;
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.producto.pedido { box-shadow: 0 6px 0 var(--durazno-osc), 0 0 0 4px var(--durazno); }
+.producto svg { width: 88px; height: 88px; display: block; margin: 0 auto 6px; }
+.producto__nombre { font: 800 1.08rem var(--display); line-height: 1.2; }
+.producto__envase { font-size: .8rem; color: var(--tinta-cl); display: block; font-weight: 600; }
+
+/* Cartel de precio, como los de cartón de la feria */
+.cartel {
+  display: inline-block;
+  background: var(--durazno);
+  color: #5A3300;
+  font: 900 1.15rem var(--display);
+  font-variant-numeric: tabular-nums;
+  padding: 6px 14px;
+  border-radius: 10px;
+  margin: 9px 0 11px;
+  transform: rotate(-2.5deg);
+  box-shadow: 0 3px 0 var(--durazno-osc);
+}
+.cartel small { display: block; font-size: .68rem; font-weight: 800; opacity: .75; letter-spacing: .05em; }
+
+/* Controles de cantidad y peso */
+/* Control de cantidad
+   ---------------------------------------------------------------------------
+   El número va arriba, en una pastilla clara y bien grande; debajo, dos
+   botones anchos que se reparten todo el ancho del cajón. Antes eran dos
+   círculos que sumaban más ancho que la tarjeta y se montaban sobre el
+   producto vecino. Así el número nunca se recorta, da igual lo que diga
+   ("8 u.", "750 g"), y hay mucha más superficie donde tocar. */
+.control { display: flex; flex-wrap: wrap; gap: 8px 8px; }
+
+.control__valor {
+  order: -1;                      /* el número, arriba y en toda la línea */
+  flex: 1 0 100%;
+  background: #EAF4FF;
+  border-radius: 999px;
+  padding: 7px 10px;
+  text-align: center;
+  font: 900 1.15rem var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--tinta);
+}
+
+.control__btn {
+  flex: 1 1 0;                    /* los dos botones reparten el ancho */
+  min-width: 0;
+  height: 50px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--menta-hondo);
+  color: #fff;
+  font: 900 1.7rem var(--display);
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--menta-relieve);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.control__btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--menta-relieve); }
+.control__btn[disabled] { background: #CBDCE6; box-shadow: 0 4px 0 #AFC5D3; color: #F2F7FA; }
+.control__btn:focus-visible { outline: 4px solid var(--uva); outline-offset: 2px; }
+
+/* Cuando hay cantidad, la pastilla se tiñe para que se note de un vistazo */
+.producto.en-carro .control__valor { background: #FFF1DC; color: #5A3300; }
+
+.producto .btn { width: 100%; }
+
+.balanza { margin-top: 8px; }
+.balanza__plato { height: 10px; border-radius: 999px; background: #E4EEF5; margin: 10px 8px 0; position: relative; overflow: hidden; }
+.balanza__aguja { position: absolute; inset: 0 auto 0 0; background: var(--menta); transition: width .28s; }
+
+/* --- Carro ---------------------------------------------------------------- */
+.carro {
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: var(--sombra-m);
+  padding: 22px;
+  position: sticky; top: 96px;
+}
+.carro h3 { color: var(--menta-texto); display: flex; align-items: center; gap: 8px; }
+.carro__vacio { color: var(--tinta-cl); font-size: 1rem; text-align: center; padding: 26px 8px; line-height: 1.55; }
+.carro__items { max-height: 46vh; overflow-y: auto; margin: 0 -8px; padding: 0 8px; }
+
+.carro__item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 0; border-bottom: 2px solid var(--linea);
+  animation: caer .34s cubic-bezier(.34,1.5,.5,1) both;
+}
+@keyframes caer { from { opacity: 0; transform: translateY(-14px) scale(.88); } }
+.carro__item svg { width: 44px; height: 44px; flex: none; }
+.carro__desc { flex: 1; line-height: 1.25; }
+.carro__desc b { font-size: 1rem; }
+.carro__desc span { display: block; font-size: .84rem; color: var(--tinta-cl); }
+/* Precio por unidad y cantidad, lo que el estudiante necesita para multiplicar */
+.carro__cuenta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin-top: 2px; }
+.carro__cuenta em {
+  font-style: normal; font-weight: 800; color: var(--menta-texto);
+  font-variant-numeric: tabular-nums;
+}
+.carro__cuenta i {
+  font-style: normal; font-size: .82rem; color: var(--tinta-cl);
+}
+.carro__cuenta strong {
+  font-family: var(--display); font-size: .95rem; color: var(--tinta);
+  background: #FFF1DC; border-radius: 7px; padding: 1px 8px;
+  font-variant-numeric: tabular-nums;
+}
+.carro__precio { font: 900 1.05rem var(--display); font-variant-numeric: tabular-nums; }
+.carro__quitar {
+  width: 46px; height: 46px; flex: none; border: 0; border-radius: 50%;
+  background: #FFE9E9; color: var(--frutilla-osc); font-size: 1.2rem; cursor: pointer;
+  box-shadow: 0 3px 0 #F5D3D3;
+}
+.carro__quitar:active { transform: translateY(3px); box-shadow: none; }
+.carro__total {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: 16px; padding-top: 14px; border-top: 4px solid var(--menta);
+  font-family: var(--display); font-weight: 800;
+}
+.carro__total b { font-size: 1.7rem; font-variant-numeric: tabular-nums; }
+
+/* --- Caja ----------------------------------------------------------------- */
+.caja { max-width: 1000px; margin: 0 auto; padding: 20px clamp(12px, 2vw, 24px) 36px; }
+
+.cuenta {
+  background: var(--menta-hondo); color: #fff;
+  border-radius: var(--r-l); padding: 26px;
+  text-align: center; box-shadow: 0 8px 0 var(--menta-relieve), var(--sombra-m); margin-bottom: 24px;
+}
+.cuenta__rotulo { font-family: var(--display); opacity: .9; letter-spacing: .12em; text-transform: uppercase; font-size: .85rem; }
+.cuenta__monto { font: 900 clamp(2.6rem, 9vw, 4rem) var(--display); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.cuenta__nota { font-size: 1rem; opacity: .95; }
+
+.bandeja {
+  background: var(--crema);
+  border: 5px dashed var(--madera);
+  border-radius: var(--r-l);
+  min-height: 168px;
+  padding: 20px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.bandeja__pista { color: #7E6539; font-family: var(--display); font-size: 1.05rem; text-align: center; font-weight: 800; }
+.bandeja.lista-para-pagar { border-color: var(--menta); background: #E9FAF4; }
+
+.pagado {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--display); font-weight: 800; margin-bottom: 22px; padding: 0 8px;
+}
+.pagado b { font-size: 1.9rem; font-variant-numeric: tabular-nums; }
+.pagado--falta b { color: var(--frutilla-osc); }
+.pagado--ok b { color: var(--menta-texto); }
+
+.billetera { background: var(--nube); border-radius: var(--r-l); box-shadow: var(--sombra-m); padding: 22px; margin-bottom: 22px; }
+.billetera h3 { color: var(--menta-texto); }
+.billetera__grupo { margin-bottom: 16px; }
+.billetera__rotulo { font-size: .85rem; color: var(--tinta-cl); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.billetera__fila { display: flex; flex-wrap: wrap; gap: 14px; }
+
+/* Una pieza de dinero: las imágenes vienen del cuadernillo original */
+.plata {
+  border: 0; background: none; padding: 0; cursor: pointer;
+  position: relative; line-height: 0; border-radius: 12px;
+  transition: transform .13s ease;
+}
+.plata img { display: block; pointer-events: none; }
+.plata--billete img { width: 132px; border-radius: 6px; box-shadow: var(--sombra-s); }
+.plata--moneda  img { width: 68px; filter: drop-shadow(0 4px 5px rgba(58,74,92,.3)); }
+.plata:active { transform: scale(.9); }
+.plata:focus-visible { outline: 4px solid var(--uva); outline-offset: 4px; }
+.plata[disabled] { opacity: .28; cursor: not-allowed; transform: none; }
+@media (hover: hover) { .plata:hover { transform: translateY(-5px) scale(1.05); } }
+
+.plata__cuantos {
+  position: absolute; top: -9px; right: -9px;
+  min-width: 30px; height: 30px; padding: 0 7px;
+  border-radius: 999px; background: var(--menta-hondo); color: #fff;
+  font: 900 .92rem var(--display); line-height: 30px; text-align: center;
+  box-shadow: 0 3px 0 var(--menta-relieve);
+}
+.bandeja .plata { animation: soltar .32s cubic-bezier(.34,1.6,.5,1) both; }
+@keyframes soltar { from { transform: translateY(-34px) rotate(-9deg); opacity: 0; } }
+
+/* --- Teclado numérico ----------------------------------------------------- */
+.vuelto-caja { max-width: 440px; margin: 0 auto; text-align: center; }
+.visor {
+  background: #3A4A5C; color: #7CF0C6;
+  border-radius: var(--r-m); padding: 18px;
+  font: 900 2.8rem var(--display); font-variant-numeric: tabular-nums;
+  margin-bottom: 16px; min-height: 84px;
+  box-shadow: inset 0 4px 14px rgba(0,0,0,.4);
+}
+.teclado { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.tecla {
+  min-height: 70px; border: 0; border-radius: var(--r-m);
+  background: var(--nube); box-shadow: 0 5px 0 #D3E2EE;
+  font: 900 1.8rem var(--display); cursor: pointer; color: var(--tinta);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.tecla:active { transform: translateY(5px); box-shadow: 0 0 0 #D3E2EE; }
+.tecla--borrar { background: #FFE9E9; color: var(--frutilla-osc); font-size: 1.4rem; box-shadow: 0 5px 0 #F5D3D3; }
+.tecla--borrar:active { box-shadow: 0 0 0 #F5D3D3; }
+
+/* --- Boleta --------------------------------------------------------------- */
+.boleta-envoltorio { max-width: 470px; margin: 0 auto; padding: 26px 16px 44px; }
+
+.boleta {
+  background: #fff;
+  padding: 28px 26px 32px;
+  box-shadow: var(--sombra-l);
+  font-family: "SF Mono", "Consolas", "Courier New", monospace;
+  font-size: .98rem;
+  position: relative;
+  animation: imprimir .75s cubic-bezier(.22,.9,.3,1) both;
+  transform-origin: top center;
+}
+@keyframes imprimir { from { transform: scaleY(.02); opacity: .2; } }
+.boleta::before, .boleta::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 14px; background: #fff;
+  -webkit-mask-image: radial-gradient(circle at 7px 0, transparent 0 7px, #000 7px);
+          mask-image: radial-gradient(circle at 7px 0, transparent 0 7px, #000 7px);
+  -webkit-mask-size: 14px 14px; mask-size: 14px 14px;
+}
+.boleta::before { top: -13px; transform: scaleY(-1); }
+.boleta::after  { bottom: -13px; }
+
+.boleta__cabecera { text-align: center; border-bottom: 3px dashed #D8E3EC; padding-bottom: 14px; margin-bottom: 14px; }
+.boleta__cabecera h2 { font-family: var(--display); color: var(--menta-texto); font-size: 1.6rem; margin: 0; }
+.boleta__cabecera p { margin: 5px 0 0; color: var(--tinta-cl); font-size: .84rem; }
+
+.boleta__fila { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; }
+.boleta__fila span:first-child { flex: 1; }
+.boleta__fila--mal { color: var(--frutilla-osc); }
+.boleta__fila--suma { border-top: 3px dashed #D8E3EC; margin-top: 12px; padding-top: 12px; font-weight: 700; }
+.boleta__fila--grande { font-size: 1.3rem; font-weight: 700; }
+
+.veredicto { text-align: center; padding: 20px 0 6px; }
+.veredicto__emoji { font-size: 4rem; display: block; animation: rebote .6s cubic-bezier(.34,1.6,.5,1) both; }
+@keyframes rebote { from { transform: scale(.2); opacity: 0; } }
+.veredicto__titulo { font-family: var(--display); font-size: 1.8rem; color: var(--menta-texto); margin: 8px 0 6px; }
+.veredicto__detalle {
+  color: var(--tinta); font-size: 1rem; line-height: 1.6; text-align: left;
+  background: var(--nube); border-radius: var(--r-m); padding: 16px 20px; box-shadow: var(--sombra-s);
+}
+.veredicto__detalle li { margin: 7px 0; }
+
+.estrellas { font-size: 2.6rem; letter-spacing: 8px; }
+.estrellas span { display: inline-block; animation: rebote .5s cubic-bezier(.34,1.6,.5,1) both; }
+.estrellas span:nth-child(2) { animation-delay: .13s; }
+.estrellas span:nth-child(3) { animation-delay: .26s; }
+
+.boleta-acciones { display: grid; gap: 14px; margin-top: 26px; }
+
+/* --- Galería del dinero --------------------------------------------------- */
+.galeria { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+.galeria__ficha {
+  background: var(--nube); border-radius: var(--r-m); box-shadow: 0 5px 0 #D9E8F2, var(--sombra-s);
+  padding: 18px; display: flex; align-items: center; gap: 16px;
+  border: 0; cursor: pointer; text-align: left; font: inherit; width: 100%;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.galeria__ficha:active { transform: translateY(5px); box-shadow: 0 0 0 #D9E8F2, var(--sombra-s); }
+.galeria__ficha img { max-width: 100px; max-height: 66px; }
+.galeria__valor { font: 900 1.6rem var(--display); font-variant-numeric: tabular-nums; color: var(--menta-texto); }
+.galeria__nombre { color: var(--tinta-cl); font-size: .95rem; font-weight: 600; }
+
+/* --- Instrucciones -------------------------------------------------------- */
+.pasos { counter-reset: paso; list-style: none; padding: 0; margin: 0; }
+.pasos li {
+  counter-increment: paso;
+  display: flex; gap: 16px; align-items: flex-start;
+  padding: 16px 0; border-bottom: 3px dashed var(--linea); line-height: 1.55;
+}
+.pasos li:last-child { border-bottom: 0; }
+.pasos li::before {
+  content: counter(paso);
+  flex: none; width: 44px; height: 44px; border-radius: 50%;
+  background: var(--menta-hondo); color: #fff;
+  font: 900 1.2rem var(--display); display: grid; place-items: center;
+  box-shadow: 0 3px 0 var(--menta-relieve);
+}
+
+/* --- Avisos, confeti, vuelo ----------------------------------------------- */
+.aviso {
+  position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%);
+  z-index: 90; max-width: min(92vw, 470px);
+  background: var(--tinta); color: #fff;
+  font: 800 1.08rem var(--display); text-align: center;
+  padding: 16px 26px; border-radius: 999px;
+  box-shadow: var(--sombra-l);
+  animation: subir .28s cubic-bezier(.34,1.5,.5,1) both;
+}
+@keyframes subir { from { transform: translateX(-50%) translateY(26px); opacity: 0; } }
+.aviso--fuera { opacity: 0; transition: opacity .4s; }
+.aviso--mal  { background: var(--frutilla-osc); }
+.aviso--bien { background: var(--menta-hondo); }
+
+.confeti { position: fixed; inset: 0; pointer-events: none; z-index: 95; }
+
+.vuelo {
+  position: fixed; z-index: 80; pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition: transform .55s cubic-bezier(.4,0,.2,1), opacity .55s;
+}
+.vuelo svg, .vuelo img { width: 76px; height: auto; display: block; }
+
+.sacudir { animation: sacudir .44s; }
+@keyframes sacudir {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-9px); }
+  40% { transform: translateX(9px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+/* --- Pantallas angostas y tablets ----------------------------------------- */
+/* Netbooks y tablets apaisadas: las tres columnas siguen cabiendo si se
+   estrechan un poco. Apilarlas obligaría a desplazar la página para llegar al
+   carro, que es justo lo que se quiere evitar. */
+@media (max-width: 1180px) and (min-width: 981px) {
+  html { font-size: 16px; }
+  /* Columnas iguales: la izquierda necesita ancho para que las teclas de la
+     calculadora no bajen del tamaño mínimo de un dedo. */
+  .mercado { grid-template-columns: 238px minmax(0, 1fr) 238px; gap: 12px; }
+  .anaquel__grilla { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; padding: 14px 12px; }
+  .producto { padding: 12px 8px 14px; }
+  .control__btn { height: 46px; font-size: 1.5rem; }
+  .producto svg { width: 68px; height: 68px; }
+  .lista { padding: 22px 14px 16px; }
+  .carro { padding: 16px; }
+  .calc { padding: 12px; }
+  .calc__teclado { gap: 6px; }
+  .tecla--calc { min-height: 48px; font-size: 1.15rem; }
+}
+
+/* Pantallas angostas y tablets verticales: una sola columna */
+@media (max-width: 980px) {
+  .mercado { grid-template-columns: 1fr; }
+  /* Con una sola columna sobra ancho: cajones más grandes para que el número
+     entre los botones (por ejemplo "500 g") nunca se recorte. */
+  .anaquel__grilla { grid-template-columns: repeat(auto-fill, minmax(182px, 1fr)); }
+  .columna-izq { order: -1; }
+  .carro { position: static; }
+  .carro__items { max-height: none; }
+}
+@media (max-width: 780px) {
+  html { font-size: 17px; }
+  .carro__items { max-height: none; }
+  .medidor { min-width: 150px; flex: 1; }
+  .plata--billete img { width: 108px; }
+  .plata--moneda img { width: 58px; }
+  .anaquel__grilla { grid-template-columns: repeat(auto-fill, minmax(152px, 1fr)); gap: 14px; padding: 18px 14px; }
+  .producto svg { width: 70px; height: 70px; }
+  .btn--grande { font-size: 1.2rem; min-height: 64px; }
+}
+
+/* --- Menos movimiento para quien lo prefiera ------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+
+/* ============================================================================
+   Pantalla completa en el mercado
+   ----------------------------------------------------------------------------
+   Solo mientras las tres columnas están a la vista (desde 981 px). Por debajo
+   de eso el carro baja a una fila propia, y forzar la altura completa lo haría
+   solaparse con la columna izquierda: ahí se vuelve al desplazamiento normal.
+
+   En pantallas amplias el mercado se comporta como una aplicación: la barra,
+   la lista y el carro quedan siempre visibles, y solo el anaquel se desplaza
+   por dentro. Así el estudiante nunca pierde de vista su presupuesto ni su
+   lista, y no tiene que mover la página para encontrar los botones.
+   ========================================================================== */
+@media (min-width: 981px) and (min-height: 620px) {
+  #pantalla-mercado.activa {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+  #pantalla-mercado .barra { margin-bottom: 0; }
+
+  /* La calculadora se ancla abajo y siempre se ve entera; si la lista es larga,
+     es ella la que se desplaza por dentro. Así el estudiante nunca tiene que
+     mover nada para llegar al teclado. */
+  .columna-izq { overflow: hidden; }
+  .columna-izq .lista { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .columna-izq #calculadora-caja { flex: 0 0 auto; }
+  .mercado { flex: 1; min-height: 0; overflow: hidden; padding-top: 18px; }
+  .mercado > * { min-height: 0; height: 100%; }
+  /* La casilla para escribir el total queda anclada abajo y siempre visible;
+     si el carro lleva muchos productos, es la lista de productos la que se
+     desplaza por dentro. Sin esto, con el carro lleno había que desplazar
+     para encontrar el botón de comprobar. */
+  .carro { position: static; overflow: hidden; display: flex; flex-direction: column; }
+  .carro > h3 { flex: 0 0 auto; }
+  .carro__items { flex: 1 1 auto; min-height: 0; max-height: none; overflow-y: auto; }
+  .carro__total, .comprobar { flex: 0 0 auto; }
+  .mercado > main { display: flex; flex-direction: column; }
+  .anaquel { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .anaquel__grilla { flex: 1; min-height: 0; overflow-y: auto; }
+}
+
+/* --- Calculadora ---------------------------------------------------------- */
+.calc {
+  background: var(--nube);
+  border-radius: var(--r-l);
+  box-shadow: var(--sombra-m);
+  padding: 14px;
+}
+.calc__cabecera {
+  display: flex; align-items: center; justify-content: space-between;
+  font: 800 1.05rem var(--display); color: var(--menta-texto); margin-bottom: 10px;
+}
+.calc__cerrar {
+  width: 46px; height: 46px; border: 0; border-radius: 50%;
+  background: #EEF4F9; color: var(--tinta-cl); font-size: 1rem; cursor: pointer;
+}
+.calc__cerrar:active { transform: scale(.9); }
+.calc__visor {
+  background: #3A4A5C; border-radius: var(--r-m);
+  padding: 10px 14px; margin-bottom: 10px; min-height: 62px;
+  display: flex; flex-direction: column; justify-content: center;
+  box-shadow: inset 0 4px 12px rgba(0,0,0,.35);
+}
+.calc__cuenta {
+  color: #AFC4D4; font: 700 1.02rem var(--display);
+  font-variant-numeric: tabular-nums; word-break: break-word;
+}
+.calc__resultado {
+  color: #7CF0C6; font: 900 1.6rem var(--display);
+  font-variant-numeric: tabular-nums; line-height: 1.15; min-height: 1.2em;
+}
+.calc__teclado { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.tecla--calc { min-height: 46px; font-size: 1.2rem; border-radius: var(--r-s); box-shadow: 0 4px 0 #D3E2EE; }
+.tecla--calc:active { transform: translateY(4px); box-shadow: 0 0 0 #D3E2EE; }
+.tecla--op { background: #EAF4FF; color: var(--menta-texto); }
+/* El = ocupa la fila entera: es la tecla que más se usa y así no se falla. */
+.tecla--igual {
+  grid-column: 1 / -1;
+  background: var(--menta-hondo); color: #fff;
+  box-shadow: 0 4px 0 var(--menta-relieve);
+}
+.tecla--igual:active { box-shadow: 0 0 0 var(--menta-relieve); }
+
+/* --- Comprobación del total (niveles 2 en adelante) ----------------------- */
+.comprobar {
+  margin-top: 16px; padding-top: 16px;
+  border-top: 4px solid var(--durazno);
+}
+.comprobar__rotulo { font: 800 1.1rem var(--display); }
+.comprobar__pista { color: var(--tinta-cl); font-size: .9rem; margin: 5px 0 12px; line-height: 1.45; }
+.comprobar__entrada { text-align: center; margin-bottom: 10px; }
+.comprobar__btn { width: 100%; }
+.comprobar--ok { border-top-color: var(--menta); text-align: center; }
+.comprobar--ok .comprobar__rotulo { color: var(--menta-texto); }
+.comprobar__monto { font: 900 2.1rem var(--display); color: var(--menta-texto); margin-top: 4px; }
+
+/* ============================================================================
+   Modo Desafíos
+   ----------------------------------------------------------------------------
+   Una sola columna centrada: un problema a la vez, sin nada alrededor que
+   distraiga. Sirve igual para trabajar en la pantalla o proyectado al curso.
+   ========================================================================== */
+.envoltorio--desafios { max-width: 760px; }
+
+/* Cinta de progreso */
+.cinta { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 22px; }
+.cinta__paso {
+  width: 46px; height: 46px; flex: none;
+  border: 3px solid var(--linea); border-radius: 14px;
+  background: var(--nube); color: var(--tinta-cl);
+  font: 900 1.05rem var(--display); cursor: pointer;
+  transition: transform .1s ease;
+}
+.cinta__paso:active { transform: scale(.92); }
+.cinta__paso.hecho { background: var(--menta-hondo); color: #fff; border-color: var(--menta-relieve); }
+.cinta__paso.actual { border-color: var(--durazno); box-shadow: 0 0 0 3px #FFE7C6; color: var(--tinta); }
+.cinta__paso.actual.hecho { color: #fff; }
+
+/* Enunciado */
+.desafio {
+  background: var(--nube); border-radius: var(--r-l); box-shadow: var(--sombra-m);
+  padding: 28px; margin-bottom: 20px;
+}
+.desafio__num {
+  font: 800 .82rem var(--display); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--tinta-cl); margin-bottom: 6px;
+}
+.desafio__titulo { color: var(--menta-texto); margin: 0 0 12px; }
+.desafio__enunciado { font-size: 1.25rem; line-height: 1.6; margin: 0; }
+
+/* Los productos del enunciado, con su precio a la vista */
+.vitrina { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; }
+.vitrina__item {
+  flex: 1 1 130px; background: var(--crema); border-radius: var(--r-m);
+  box-shadow: 0 5px 0 var(--madera); padding: 12px 8px 14px; text-align: center;
+}
+.vitrina__item svg { width: 66px; height: 66px; display: block; margin: 0 auto 4px; }
+.vitrina__item b { display: block; font: 800 1rem var(--display); }
+.vitrina__precio {
+  display: inline-block; margin-top: 6px; background: var(--durazno); color: #5A3300;
+  border-radius: 9px; padding: 4px 10px; font: 900 1rem var(--display);
+  font-variant-numeric: tabular-nums; box-shadow: 0 3px 0 var(--durazno-osc);
+}
+.vitrina__precio small { display: block; font-size: .66rem; opacity: .8; font-weight: 800; }
+
+/* Pista */
+.pista {
+  background: #FFF6DC; border-radius: var(--r-m); padding: 18px 22px;
+  margin-bottom: 20px; box-shadow: var(--sombra-s);
+}
+.pista b { font-family: var(--display); font-size: 1.05rem; }
+.pista p { margin: 6px 0 0; line-height: 1.55; }
+
+/* Responder con número */
+.respuesta { text-align: center; }
+.visor--desafio { font-size: 2.4rem; }
+.respuesta .teclado { max-width: 380px; margin: 0 auto 18px; }
+.respuesta > .btn { width: 100%; max-width: 380px; }
+
+/* Elegir entre opciones */
+.elecciones { display: grid; gap: 14px; }
+.eleccion { width: 100%; text-align: center; line-height: 1.3; padding: 14px 24px; height: auto; min-height: 74px; }
+
+/* Armar una compra */
+.marcador {
+  display: flex; justify-content: space-around; gap: 16px;
+  background: var(--menta-hondo); color: #fff; border-radius: var(--r-l);
+  padding: 18px; margin-bottom: 18px; text-align: center;
+  box-shadow: 0 6px 0 var(--menta-relieve);
+}
+.marcador span { display: block; font: 700 .85rem var(--display); opacity: .9; }
+.marcador b { font-size: 1.9rem; font-family: var(--display); }
+.marcador--pasado { background: var(--frutilla-osc); box-shadow: 0 6px 0 #B94545; }
+
+.feria { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }
+.feria__item {
+  background: var(--crema); border-radius: var(--r-m); box-shadow: 0 6px 0 var(--madera);
+  padding: 14px 10px 16px; text-align: center;
+}
+.feria__item.en-carro { box-shadow: 0 6px 0 var(--durazno-osc), 0 0 0 4px var(--durazno); }
+.feria__item svg { width: 62px; height: 62px; display: block; margin: 0 auto 4px; }
+.feria__item b { display: block; font: 800 .98rem var(--display); }
+.feria__precio { display: block; font: 800 .88rem var(--display); color: var(--menta-texto); margin: 2px 0 8px; }
+
+/* Resuelto */
+.logro {
+  background: #E9FAF4; border-radius: var(--r-l); padding: 26px;
+  text-align: center; margin-bottom: 20px; box-shadow: var(--sombra-s);
+}
+.logro__emoji { font-size: 3.4rem; display: block; animation: rebote .6s cubic-bezier(.34,1.6,.5,1) both; }
+.logro h3 { font-size: 1.5rem; color: var(--menta-texto); margin: 8px 0 8px; }
+.logro__explica { font-size: 1.08rem; line-height: 1.6; margin: 0; font-variant-numeric: tabular-nums; }
+
+/* Cómo lo pensé */
+.estrategias { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }
+.estrategia {
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  border: 3px solid var(--linea); border-radius: var(--r-m); background: #fff;
+  padding: 12px; cursor: pointer; font: 700 .95rem var(--texto); color: var(--tinta);
+  min-height: 60px; transition: transform .1s ease;
+}
+.estrategia:active { transform: scale(.97); }
+.estrategia.marcada { border-color: var(--menta); background: #E9FAF4; }
+.estrategia__emoji { font-size: 1.6rem; flex: none; }
+
+/* --- Proyección: todo más grande para mostrar al curso ------------------- */
+html.proyeccion { font-size: 22px; }
+html.proyeccion .desafio__enunciado { font-size: 1.45rem; }
+html.proyeccion .envoltorio--desafios { max-width: 900px; }
+html.proyeccion .vitrina__item svg { width: 84px; height: 84px; }
+html.proyeccion .visor--desafio { font-size: 3.2rem; }
+
+@media (max-width: 620px) {
+  .vitrina { gap: 10px; }
+  .vitrina__item { flex: 1 1 100px; }
+  .feria { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .estrategias { grid-template-columns: 1fr 1fr; }
+  .desafio { padding: 20px; }
+  .desafio__enunciado { font-size: 1.1rem; }
+}
+
+/* ============================================================================
+   Modo aula
+   ----------------------------------------------------------------------------
+   El tablero del profesor no ordena ni puntúa: solo muestra quién ya respondió
+   y quién sigue pensando, para poder acercarse a apoyar. Las respuestas
+   aparecen todas juntas cuando el profesor decide comentarlas.
+   ========================================================================== */
+.sala {
+  display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-around;
+  background: var(--menta-hondo); color: #fff; border-radius: var(--r-l);
+  padding: 22px; margin-bottom: 20px; text-align: center;
+  box-shadow: 0 6px 0 var(--menta-relieve);
+}
+.sala__rotulo {
+  display: block; font: 700 .82rem var(--display);
+  letter-spacing: .12em; text-transform: uppercase; opacity: .9;
+}
+.sala__codigo {
+  font: 900 clamp(2.4rem, 7vw, 3.6rem) var(--display);
+  letter-spacing: .14em; font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.sala__url { font: 900 clamp(1.4rem, 4vw, 2.2rem) var(--display); line-height: 1.2; word-break: break-all; }
+
+.aula-mando { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.aula-mando .btn { flex: 1 1 auto; }
+
+.tablero { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.alumno {
+  border-radius: var(--r-m); padding: 14px; background: #fff;
+  border: 3px solid var(--linea); box-shadow: var(--sombra-s);
+}
+.alumno b { display: block; font: 800 1.08rem var(--display); }
+.alumno__estado { font-size: .88rem; color: var(--tinta-cl); font-weight: 700; }
+.alumno__valor {
+  font: 900 1.4rem var(--display); font-variant-numeric: tabular-nums;
+  margin-top: 6px;
+}
+.alumno__estrategias { font-size: .8rem; color: var(--tinta-cl); margin-top: 6px; line-height: 1.4; }
+
+/* Antes de revelar solo se distingue quién ya respondió */
+.alumno--pensando { background: #FFFDF5; border-color: #EADFC4; }
+.alumno--listo    { background: #EAF4FF; border-color: #B9D8F5; }
+/* Después, sin puntajes: correcto o "para revisar juntos" */
+.alumno--bien     { background: #E9FAF4; border-color: var(--menta); }
+.alumno--revisar  { background: #FFF1F1; border-color: #F3B9B9; }
+.alumno--revisar .alumno__estado { color: var(--frutilla-osc); }
+
+@media (max-width: 620px) {
+  .sala { gap: 12px; padding: 16px; }
+  .aula-mando .btn { flex: 1 1 100%; }
+}
+
+/* Actividad de compras ya enviada a las tablets */
+.enviada {
+  background: #E9FAF4; border-radius: var(--r-m); padding: 14px 18px;
+  margin-bottom: 16px; border: 3px solid var(--menta);
+}
+.enviada b { display: block; font-family: var(--display); color: var(--menta-texto); }
+.enviada span { font-size: .92rem; color: var(--tinta-cl); }
+
+/* El panel de preparación, embebido en el modo aula */
+.aula-config .panel { box-shadow: var(--sombra-s); }
+
+/* Estudiante trabajando en su compra */
+.alumno--trabajando { background: #FFF6DC; border-color: #EBD79B; }
+
+/* --- Respuesta equivocada dejada anotada ---------------------------------- */
+/* Se muestra sin dramatizar: el error es información para comentar en clase,
+   no un castigo. Por eso el tono es neutro y no rojo de alarma. */
+.desafio-extras { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; justify-content: center; }
+
+.logro--revisar { background: #FFF6DC; }
+.logro--revisar h3 { color: #8A6A1E; }
+.logro__animo { color: var(--tinta-cl); font-size: .95rem; margin: 12px 0 0; line-height: 1.5; }
+
+.contraste { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 16px 0 6px; }
+.contraste__lado {
+  flex: 1 1 150px; background: #fff; border-radius: var(--r-m);
+  padding: 12px 16px; box-shadow: var(--sombra-s); border: 3px solid var(--linea);
+}
+.contraste__lado span {
+  display: block; font: 700 .8rem var(--display);
+  letter-spacing: .06em; text-transform: uppercase; color: var(--tinta-cl);
+}
+.contraste__lado b {
+  font: 900 1.5rem var(--display); font-variant-numeric: tabular-nums;
+  line-height: 1.2; display: block; margin-top: 2px;
+}
+.contraste__lado--buena { border-color: var(--menta); background: #E9FAF4; }
+.contraste__lado--buena b { color: var(--menta-texto); }
+
+/* En la cinta, lo dejado con error se marca distinto de lo resuelto */
+.cinta__paso.revisar { background: #FFF1DC; border-color: #E8C88A; color: #8A6A1E; }
+
+/* --- Tecla de borrar el último número ------------------------------------- */
+/* Un error al final no debería obligar a rehacer toda la cuenta. */
+.tecla--atras { background: #FFF1DC; color: #8A6A1E; box-shadow: 0 5px 0 #E8D3A8; }
+.tecla--atras:active { box-shadow: 0 0 0 #E8D3A8; }
+.tecla--calc.tecla--atras { box-shadow: 0 4px 0 #E8D3A8; }
+.tecla--calc.tecla--atras:active { box-shadow: 0 0 0 #E8D3A8; }
+.teclado--cuatro { grid-template-columns: repeat(4, 1fr); }
+.tecla--ancha { grid-column: span 2; }
+
+/* ============================================================================
+   Seguimiento del curso
+   ========================================================================== */
+.resumenes { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); margin-bottom: 20px; }
+.resumen {
+  background: var(--nube); border-radius: var(--r-m); box-shadow: var(--sombra-s);
+  padding: 16px; text-align: center;
+}
+.resumen__emoji { font-size: 1.6rem; display: block; }
+.resumen__cifra {
+  display: block; font: 900 1.8rem var(--display);
+  font-variant-numeric: tabular-nums; color: var(--menta-texto); line-height: 1.15;
+}
+.resumen__texto { font-size: .84rem; color: var(--tinta-cl); font-weight: 700; }
+
+.seguimiento { display: grid; gap: 14px; }
+.seguido {
+  background: #fff; border: 3px solid var(--linea); border-radius: var(--r-m); padding: 14px 16px;
+}
+.seguido--callado { background: #FFFDF5; border-color: #EADFC4; }
+
+.seguido__cabecera { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.seguido__cabecera b { font: 800 1.12rem var(--display); flex: 1; }
+.seguido__senal { font-size: .8rem; color: var(--menta-texto); font-weight: 700; }
+.seguido--callado .seguido__senal { color: #8A6A1E; }
+.seguido__sacar {
+  width: 34px; height: 34px; flex: none; border: 0; border-radius: 50%;
+  background: #F2F7FA; color: var(--tinta-cl); cursor: pointer; font-size: .95rem;
+}
+.seguido__sacar:active { transform: scale(.9); }
+
+.seguido__bloque { margin-top: 8px; }
+.seguido__rotulo {
+  display: block; font: 800 .74rem var(--display);
+  letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-cl); margin-bottom: 4px;
+}
+.seguido__detalle { font-size: .94rem; line-height: 1.5; font-variant-numeric: tabular-nums; }
+
+.marcas { display: flex; flex-wrap: wrap; gap: 5px; }
+.marca {
+  width: 30px; height: 30px; border-radius: 9px;
+  display: grid; place-items: center;
+  font: 900 .92rem var(--display);
+}
+.marca--sin { background: #F2F7FA; color: #B4C4D2; }
+.marca--bien { background: #E9FAF4; color: var(--menta-texto); }
+.marca--revisar { background: #FFF1DC; color: #8A6A1E; }
+
+@media (max-width: 620px) {
+  .resumenes { grid-template-columns: 1fr 1fr; }
+}
+
+/* El ✓ del vuelto: antes usaba una variable de color que ya no existía y
+   quedaba sin fondo. */
+.tecla--ok { background: var(--menta-hondo); color: #fff; box-shadow: 0 5px 0 var(--menta-relieve); }
+.tecla--ok:active { box-shadow: 0 0 0 var(--menta-relieve); }
+
+/* ============================================================================
+   Informe de la clase
+   ----------------------------------------------------------------------------
+   Pensado para verse en pantalla y salir bien en papel: negro sobre blanco,
+   sin sombras ni colores que gasten tinta, y sin cortar a un estudiante entre
+   dos hojas.
+   ========================================================================== */
+.informe { background: #fff; border-radius: var(--r-l); padding: 34px; box-shadow: var(--sombra-m); }
+.informe__encabezado { border-bottom: 3px solid var(--linea); padding-bottom: 14px; margin-bottom: 20px; }
+.informe__encabezado h1 { font-size: 1.7rem; margin: 0 0 4px; color: var(--menta-texto); }
+.informe__encabezado p { margin: 0; color: var(--tinta-cl); font-size: .95rem; }
+
+.informe__resumen { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 24px; }
+.informe__resumen > div { flex: 1 1 130px; text-align: center; background: var(--nube); border-radius: var(--r-m); padding: 12px; }
+.informe__resumen b { display: block; font: 900 1.7rem var(--display); font-variant-numeric: tabular-nums; }
+.informe__resumen span { font-size: .84rem; color: var(--tinta-cl); }
+
+.informe__bloque { margin-bottom: 26px; }
+.informe__bloque h2 { font-size: 1.22rem; color: var(--menta-texto); margin: 0 0 12px; }
+.informe__lista { margin: 0; padding-left: 22px; line-height: 1.7; }
+
+.informe__alumno { border-top: 2px solid var(--linea); padding: 16px 0 4px; }
+.informe__alumno h3 { margin: 0 0 10px; font-size: 1.1rem; }
+.informe__dato { margin: 8px 0 0; font-size: .95rem; line-height: 1.55; }
+
+.informe__tabla { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.informe__tabla th, .informe__tabla td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--linea); }
+.informe__tabla th { font: 800 .78rem var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--tinta-cl); }
+.informe__tabla td { font-variant-numeric: tabular-nums; }
+
+.informe__pie { margin-top: 26px; padding-top: 14px; border-top: 2px solid var(--linea);
+  font-size: .82rem; color: var(--tinta-cl); text-align: center; }
+
+/* --- En papel --- */
+@media print {
+  body, html { background: #fff; }
+  .no-imprimir, .barra, .encabezado { display: none !important; }
+  .pantalla { display: none !important; }
+  .pantalla#pantalla-informe { display: block !important; }
+  .envoltorio { max-width: none; padding: 0; }
+  .informe { box-shadow: none; padding: 0; border-radius: 0; }
+  .informe__alumno { break-inside: avoid; page-break-inside: avoid; }
+  .informe__resumen > div { border: 1px solid #ccc; background: #fff; }
+  .informe__encabezado h1, .informe__bloque h2 { color: #000; }
+}
+
+/* El archivo descargado se abre solo, sin el resto del juego */
+body.solo-informe { background: #fff; padding: 24px; }
+body.solo-informe .informe { box-shadow: none; padding: 0; }
+
+/* ============================================================================
+   Feria en parejas
+   ========================================================================== */
+.roles { display: flex; gap: 12px; margin-bottom: 18px; }
+.rol {
+  flex: 1 1 0; text-align: center; background: var(--nube);
+  border-radius: var(--r-m); padding: 12px 8px; border: 3px solid transparent;
+}
+.rol--yo { border-color: var(--menta); background: #E9FAF4; }
+.rol__emoji { font-size: 1.7rem; display: block; }
+.rol b { display: block; font: 800 1.02rem var(--display); }
+.rol__texto { font-size: .82rem; color: var(--tinta-cl); }
+
+.espera {
+  background: var(--nube); border-radius: var(--r-l); padding: 30px 24px;
+  text-align: center; box-shadow: var(--sombra-s);
+}
+.espera__emoji { font-size: 2.6rem; display: block; }
+.espera b { display: block; font: 900 1.3rem var(--display); margin: 8px 0 4px; color: var(--menta-texto); }
+.espera p { margin: 0; color: var(--tinta-cl); }
+
+.pedido__fila {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 2px dashed var(--linea); font-size: 1.02rem;
+}
+.pedido__fila:last-child { border-bottom: 0; }
+
+.cobro-feria {
+  display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: center; align-items: baseline;
+  background: var(--menta-hondo); color: #fff; border-radius: var(--r-l);
+  padding: 16px 20px; margin-bottom: 18px; box-shadow: 0 6px 0 var(--menta-relieve);
+}
+.cobro-feria span { font: 700 .9rem var(--display); opacity: .92; }
+.cobro-feria b { font: 900 1.6rem var(--display); font-variant-numeric: tabular-nums; }
+
+.mostrador {
+  background: #EAF4FF; border-radius: var(--r-m); padding: 12px;
+  text-align: center; margin-bottom: 12px;
+}
+.mostrador span { display: block; font: 700 .84rem var(--display); color: var(--tinta-cl); }
+.mostrador b { font: 900 1.6rem var(--display); font-variant-numeric: tabular-nums; }
+
+/* El dinero del mostrador reutiliza las piezas de la caja */
+.mostrador-billetes { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.plata--puesta { outline: 4px solid var(--durazno); outline-offset: 2px; }
+
+/* Comparación entre lo que dijeron y lo que era.
+   Se llama "calce" y no "cuenta" porque .cuenta ya es la de la caja. */
+.calces { display: grid; gap: 10px; margin: 14px 0 4px; }
+.calce {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px;
+  justify-content: center; background: #fff; border-radius: var(--r-m);
+  padding: 10px 14px; border: 3px solid var(--linea);
+}
+.calce__rotulo { font: 700 .88rem var(--display); color: var(--tinta-cl); }
+.calce b { font: 900 1.35rem var(--display); font-variant-numeric: tabular-nums; }
+.calce--bien { border-color: var(--menta); background: #E9FAF4; }
+.calce--mal { border-color: #F3B9B9; background: #FFF1F1; }
+.calce__era { font: 800 .92rem var(--display); color: var(--frutilla-osc); }
+
+@media (max-width: 620px) {
+  .roles { gap: 8px; }
+  .rol__emoji { font-size: 1.4rem; }
+}
+
+/* El vuelto bien restado sobre un cobro equivocado: el error viene de antes */
+.calce--arrastre { border-color: #EBD79B; background: #FFF6DC; }
+.calce--arrastre .calce__era { color: #8A6A1E; }
+
+/* ============================================================================
+   Armador manual de puestos de feria
+   ----------------------------------------------------------------------------
+   Toca un nombre y después el puesto donde va: dos toques en vez de arrastrar,
+   que es más confiable en tablets.
+   ========================================================================== */
+.armador__bloque { margin-top: 14px; }
+.armador__pendientes { display: flex; flex-wrap: wrap; gap: 8px; }
+.armador__nombre {
+  border: 3px solid var(--linea); border-radius: 999px; background: #fff;
+  padding: 9px 18px; font: 800 .96rem var(--display); cursor: pointer;
+}
+.armador__nombre.elegido {
+  background: var(--menta-hondo); color: #fff; border-color: var(--menta-relieve);
+  box-shadow: 0 0 0 3px #B9EBD4;
+}
+.armador__listo { color: var(--menta-texto); font-weight: 800; }
+
+.armador__puestos { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.armador__puesto {
+  border: 3px dashed var(--linea); border-radius: var(--r-m); background: var(--nube);
+  padding: 12px; min-height: 66px; cursor: default;
+}
+.armador__puesto--activo { cursor: pointer; border-color: var(--durazno); background: #FFF6E9; }
+.armador__puesto--activo:active { transform: scale(.98); }
+.armador__numero {
+  display: block; font: 800 .74rem var(--display); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--tinta-cl); margin-bottom: 6px;
+}
+.armador__vacio { font-size: .88rem; color: var(--tinta-cl); font-style: italic; }
+.armador__ficha {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #fff; border-radius: 999px; padding: 6px 8px 6px 14px;
+  margin: 3px 4px 0 0; font: 800 .92rem var(--display); box-shadow: var(--sombra-s);
+}
+.armador__sacar {
+  width: 22px; height: 22px; flex: none; border: 0; border-radius: 50%;
+  background: #FFF1F1; color: var(--frutilla-osc); font-size: .78rem; cursor: pointer;
+}
+
+@media (max-width: 620px) {
+  .armador__puestos { grid-template-columns: 1fr 1fr; }
+}
+
+/* Presupuesto ajustable para el comprador de cada puesto */
+.ppto-feria {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--nube); border-radius: var(--r-m); padding: 10px 14px;
+  margin: 12px 0; font: 700 .92rem var(--display);
+}
+.ppto-feria span { flex: 1 1 100%; color: var(--tinta-cl); }
+.ppto-feria b { font: 900 1.2rem var(--display); font-variant-numeric: tabular-nums; min-width: 70px; text-align: center; }
+/* Los botones +/− del presupuesto son los mismos .control__btn del carro,
+   pero ahí miden 44px por defecto; aquí necesitan el tamaño táctil mínimo
+   incluso dentro de una fila angosta. */
+.ppto-feria .control__btn { width: 44px; height: 44px; flex: 0 0 44px; }
+
+/* ============================================================================
+   Teclado numérico modal
+   ----------------------------------------------------------------------------
+   Se usa para escribir un número exacto (presupuesto, largo de la lista,
+   cantidad de un producto) en vez de tocar +/- muchas veces, con la misma
+   tecla ⌫ del resto del juego.
+   ========================================================================== */
+.modal-fondo {
+  position: fixed; inset: 0; background: rgba(30, 42, 56, .55);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 999;
+}
+.teclado-modal__tarjeta {
+  background: var(--nube); border-radius: var(--r-l); box-shadow: var(--sombra-m);
+  padding: 26px; width: 100%; max-width: 360px; text-align: center;
+}
+.teclado-modal__tarjeta h3 { margin: 0 0 14px; }
+.teclado-modal__visor { font-size: 1.9rem; margin-bottom: 16px; }
+.teclado-modal__acciones { display: flex; gap: 10px; margin-top: 14px; }
+.teclado-modal__acciones .btn { flex: 1 1 0; }
+
+/* Chip tocable que abre el teclado modal (presupuesto, largo de lista) */
+.chip-numero {
+  width: 100%; border: 3px solid var(--linea); border-radius: 999px;
+  background: #fff; padding: 10px 20px; font: 900 1.1rem var(--display);
+  color: var(--tinta); cursor: pointer; text-align: center;
+}
+.chip-numero:disabled { opacity: .55; cursor: not-allowed; }
+.chip-numero:not(:disabled):active { transform: scale(.97); }
+
+/* El valor de cantidad, ahora tocable para abrir el teclado */
+.picker__valor--tocable { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+
+/* Con «Te queda» apagado no se muestra la barra: delataría lo mismo */
+.medidor--sin-resto .medidor__riel { visibility: hidden; }
+
+/* Aviso neutro cuando la suma de la bandeja está oculta: recuerda qué hacer
+   sin resolver la suma por el estudiante. */
+.pagado--mudo {
+  justify-content: center; background: var(--nube); color: var(--tinta-cl);
+  font-weight: 700; font-size: .95rem;
+}

@@ -1,0 +1,11 @@
+# construir.py escribe con saltos de línea LF. Sin esto, Git convertiría el
+# archivo único a CRLF en la copia de trabajo y cada reconstrucción aparecería
+# como un cambio completo del archivo, aunque no hubiera cambiado nada.
+* text=auto eol=lf
+
+# El .bat lo lee cmd.exe, que quiere CRLF.
+*.bat text eol=crlf
+
+*.png  binary
+*.ico  binary
+*.pdf  binary

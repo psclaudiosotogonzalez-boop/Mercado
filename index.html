@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mercado · Manejo de dinero</title>
+<meta name="description" content="Juego educativo para aprender a manejar dinero chileno: hacer las compras con un presupuesto y pagar en la caja.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='78' font-size='80'>🛒</text></svg>">
+</head>
+<body>
+
+<!-- ══════════════════════════ 1. MENÚ PRINCIPAL ══════════════════════════ -->
+<section class="pantalla activa" id="pantalla-menu">
+  <div class="envoltorio portada">
+    <div class="portada__marco">
+      <div class="toldo"></div>
+      <div class="portada__cuerpo">
+        <h1 class="portada__titulo">Mercado</h1>
+        <p class="portada__bajada">Haz las compras con tu presupuesto y paga en la caja.</p>
+        <div class="menu-botones">
+          <button class="btn btn--principal btn--grande" data-ir="niveles">🛒 Ir de compras</button>
+          <button class="btn btn--verde btn--grande" id="btn-desafios">🧠 Desafíos</button>
+          <button class="btn" id="btn-aula" hidden>📡 Modo aula (varias tablets)</button>
+          <button class="btn" data-ir="dinero">💵 Conoce el dinero</button>
+          <button class="btn" data-ir="instrucciones">📖 Cómo se juega</button>
+          <button class="btn btn--fantasma" data-ir="config">⚙️ Preparar la actividad</button>
+        </div>
+      </div>
+    </div>
+    <p class="pie">Monedas y billetes del peso chileno · Funciona sin internet</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ 2. ELEGIR NIVEL ════════════════════════════ -->
+<section class="pantalla" id="pantalla-niveles">
+  <div class="envoltorio">
+    <div class="encabezado">
+      <button class="btn btn--chico btn--fantasma" data-ir="menu">⬅ Volver al menú</button>
+      <div class="encabezado__hueco"></div>
+      <button class="btn btn--chico btn--fantasma" data-ir="config">⚙️ Preparar</button>
+    </div>
+    <h2>¿Qué reto quieres hacer?</h2>
+    <div class="niveles" id="grilla-niveles"></div>
+  </div>
+</section>
+
+<!-- ══════════════════ 3. PREPARAR LA ACTIVIDAD (profesor) ════════════════ -->
+<section class="pantalla" id="pantalla-config">
+  <div class="envoltorio">
+    <div class="encabezado">
+      <button class="btn btn--chico btn--fantasma" data-ir="menu">⬅ Volver al menú</button>
+    </div>
+    <h2>Preparar la actividad</h2>
+    <div id="config-cuerpo"></div>
+    <div class="menu-botones" style="max-width:none">
+      <button class="btn btn--principal btn--grande" id="config-empezar">Empezar la compra</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ 4. CONOCE EL DINERO ════════════════════════════ -->
+<section class="pantalla" id="pantalla-dinero">
+  <div class="envoltorio">
+    <div class="encabezado">
+      <button class="btn btn--chico btn--fantasma" data-ir="menu">⬅ Volver al menú</button>
+    </div>
+    <h2>El dinero chileno</h2>
+    <p class="panel__nota">Toca cada uno para escuchar cuánto vale.</p>
+    <div class="panel">
+      <h3>Billetes</h3>
+      <div class="galeria" id="galeria-billetes"></div>
+    </div>
+    <div class="panel">
+      <h3>Monedas</h3>
+      <div class="galeria" id="galeria-monedas"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 5. INSTRUCCIONES ════════════════════════════ -->
+<section class="pantalla" id="pantalla-instrucciones">
+  <div class="envoltorio">
+    <div class="encabezado">
+      <button class="btn btn--chico btn--fantasma" data-ir="menu">⬅ Volver al menú</button>
+    </div>
+    <h2>Cómo se juega</h2>
+    <div class="panel">
+      <ol class="pasos">
+        <li>Mira tu <b>lista de compras</b>. Ahí dice qué tienes que llevar y cuánto.</li>
+        <li>Recorre los <b>anaqueles</b> del mercado y busca cada producto en su sección.</li>
+        <li>Agrega lo que necesitas al <b>carro</b>. Arriba ves cuánta plata te queda.</li>
+        <li>Cuando tengas todo, anda a la <b>caja</b>.</li>
+        <li>Paga con tus <b>billetes y monedas</b>: tócalos para ponerlos en la bandeja.</li>
+        <li>Recibe tu <b>boleta</b> y descubre cuántas estrellas ganaste.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Para el profesor</h3>
+      <p class="panel__nota">
+        En <b>Preparar la actividad</b> se define el presupuesto, el largo de la lista, si el pago
+        debe ser exacto o con vuelto, y qué apoyos quedan disponibles (subtotales y calculadora).
+        Los apoyos se pueden ir retirando a medida que el estudiante avanza.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ 5d. FERIA EN PAREJAS (uno vende, otro compra) ══════ -->
+<section class="pantalla" id="pantalla-feria">
+  <div class="barra">
+    <button class="btn btn--fantasma btn--chico" data-ir="menu">⬅ Salir</button>
+    <div class="barra__hueco"></div>
+  </div>
+  <div class="envoltorio envoltorio--desafios" id="feria-cuerpo"></div>
+</section>
+
+<!-- ═══════════════════ 5c. INFORME DE LA CLASE (imprimible) ══════════════ -->
+<section class="pantalla" id="pantalla-informe">
+  <div class="envoltorio">
+    <div class="encabezado no-imprimir">
+      <button class="btn btn--chico btn--fantasma" data-ir="aula">⬅ Volver</button>
+      <div class="barra__hueco"></div>
+      <button class="btn btn--chico" id="btn-bajar-informe">💾 Descargar</button>
+      <button class="btn btn--chico btn--principal" id="btn-imprimir">🖨️ Imprimir o guardar PDF</button>
+    </div>
+    <div id="informe-cuerpo" class="informe"></div>
+  </div>
+</section>
+
+<!-- ══════════════ 5a. MODO AULA (solo si hay servidor detrás) ═════════════ -->
+<section class="pantalla" id="pantalla-aula">
+  <div class="envoltorio">
+    <div class="encabezado">
+      <button class="btn btn--chico btn--fantasma" data-ir="menu">⬅ Volver al menú</button>
+    </div>
+    <h2>Modo aula</h2>
+    <div id="aula-cuerpo"></div>
+  </div>
+</section>
+
+<!-- ═════════════════════ 5b. DESAFÍOS (no rutinarios) ════════════════════ -->
+<section class="pantalla" id="pantalla-desafios">
+  <div class="barra">
+    <button class="btn btn--fantasma btn--chico" data-ir="menu">⬅ Salir</button>
+    <div class="barra__hueco"></div>
+    <button class="btn btn--fantasma btn--chico" id="btn-proyeccion">🔍 Letra grande</button>
+  </div>
+  <div class="envoltorio envoltorio--desafios" id="desafios-cuerpo"></div>
+</section>
+
+<!-- ═══════════════════════════ 6. MERCADO ════════════════════════════════ -->
+<section class="pantalla" id="pantalla-mercado">
+  <div class="barra">
+    <button class="btn btn--fantasma btn--chico" data-ir="niveles">⬅ Salir</button>
+    <div class="medidor" id="medidor">
+      <div class="medidor__cifras">
+        <span id="medidor-rotulo">Te queda</span>
+        <span id="medidor-presupuesto"></span>
+      </div>
+      <div class="medidor__gastado cifra" id="medidor-restante">$0</div>
+      <div class="medidor__riel"><div class="medidor__lleno" id="medidor-lleno"></div></div>
+    </div>
+    <div class="barra__hueco"></div>
+    <button class="btn btn--chico btn--fantasma" id="btn-calculadora" hidden>🧮 Calculadora</button>
+    <button class="btn btn--principal" id="btn-a-caja">Ir a pagar ➡</button>
+  </div>
+
+  <div class="mercado">
+    <aside class="columna-izq">
+      <div class="lista" id="lista-compras"></div>
+      <div id="calculadora-caja"></div>
+    </aside>
+    <main>
+      <div class="secciones" id="secciones"></div>
+      <div class="anaquel">
+        <div class="anaquel__toldo toldo" style="height:26px"></div>
+        <div class="anaquel__grilla" id="anaquel"></div>
+      </div>
+    </main>
+    <aside class="carro" id="carro"></aside>
+  </div>
+</section>
+
+<!-- ═════════════════════════════ 7. CAJA ═════════════════════════════════ -->
+<section class="pantalla" id="pantalla-caja">
+  <div class="barra">
+    <button class="btn btn--fantasma btn--chico" id="btn-volver-mercado">⬅ Volver al mercado</button>
+    <div class="barra__hueco"></div>
+  </div>
+  <div class="caja" id="caja-cuerpo"></div>
+</section>
+
+<!-- ═════════════════════════ 8. ¿CUÁNTO VUELTO? ══════════════════════════ -->
+<section class="pantalla" id="pantalla-vuelto">
+  <div class="envoltorio">
+    <h2 style="text-align:center">¿Cuánto vuelto te tienen que dar?</h2>
+    <div class="panel" id="vuelto-cuerpo"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 9. BOLETA ═════════════════════════════════ -->
+<section class="pantalla" id="pantalla-boleta">
+  <div class="boleta-envoltorio" id="boleta-cuerpo"></div>
+</section>
+
+<!-- Orden de carga: utilidades → datos → dibujos → lógica → pantallas → app.
+     util.js va primero porque los enunciados de los desafíos dan formato a
+     los precios ($2.460) al construirse. -->
+<script src="js/util.js"></script>
+<script src="js/data.js"></script>
+<script src="js/svg.js"></script>
+<script src="js/lista.js"></script>
+<script src="js/mercado.js"></script>
+<script src="js/caja.js"></script>
+<script src="js/desafios.js"></script>
+<script src="js/feria.js"></script>
+<script src="js/aula.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

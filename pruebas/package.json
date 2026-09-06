@@ -1,0 +1,14 @@
+{
+  "name": "mercado-pruebas",
+  "private": true,
+  "description": "Pruebas del juego Mercado con un navegador real",
+  "scripts": {
+    "chromium": "node descargar-chromium.js",
+    "regresion": "node regresion.js",
+    "todo": "node regresion.js && node prueba-vuelto.js && node prueba-tequeda.js && node prueba-bandeja.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^24.0.0",
+    "@sparticuz/chromium": "^149.0.0"
+  }
+}
