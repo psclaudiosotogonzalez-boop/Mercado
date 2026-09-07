@@ -59,4 +59,10 @@ doble clic, sin nada instalado.
 
 Las imágenes del dinero provienen del *Cuadernillo de manejo de dinero*
 (teocognitiva, Terapia Ocupacional), que usa el curso: los estudiantes tienen
-que reconocer el dinero real. El cuadernillo completo no se redistribuye aquí.
+que reconocer el dinero real.
+
+`Cuadernillo de dinero chileno.pdf` es la versión imprimible que se armó en este
+proyecto. Ningún código lo usa: está aquí como material de consulta y porque
+lleva los billetes y las monedas al **doble de la resolución** que usa el juego
+(654 × 306 los billetes, contra 327 × 153), que es de donde hay que sacarlos si
+se rehace el material gráfico.
