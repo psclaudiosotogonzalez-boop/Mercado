@@ -35,15 +35,16 @@ def main() -> None:
     for nombre in JS:
         codigo = (RAIZ / "js" / nombre).read_text(encoding="utf-8")
 
-        if nombre == "data.js":
-            # Reemplaza cada ruta 'img/...png' por su contenido en base64
-            def incrustar(m):
-                ruta = RAIZ / m.group(1)
-                if not ruta.exists():
-                    raise SystemExit(f"Falta la imagen: {ruta}")
-                return f"'{como_data_uri(ruta)}'"
+        # Reemplaza cada ruta 'img/...png' por su contenido en base64. Se hace en
+        # todos los modulos, no solo en data.js: el dinero vive en data.js y los
+        # pictogramas de los productos en svg.js.
+        def incrustar(m):
+            ruta = RAIZ / m.group(1)
+            if not ruta.exists():
+                raise SystemExit(f"Falta la imagen: {ruta}")
+            return f"'{como_data_uri(ruta)}'"
 
-            codigo = re.sub(r"'(img/[^']+\.png)'", incrustar, codigo)
+        codigo = re.sub(r"'(img/[^']+\.png)'", incrustar, codigo)
 
         # Cada modulo va en su propio bloque <script>. Si un navegador viejo no
         # entendiera uno de ellos, los demas siguen funcionando en vez de caerse

@@ -60,7 +60,7 @@ const PRODUCTOS_MERCADO = [
   /* Panadería */
   { id: 'marraqueta', nombre: 'Marraquetas',  seccion: 'panaderia', unidad: 200, kilo: 2000, pesoMax: 1000 },
   { id: 'panmolde',   nombre: 'Pan de molde', seccion: 'panaderia', fijo: 1900, envase: 'bolsa', plural: 'panes de molde' },
-  { id: 'berlin',     nombre: 'Berlines',     seccion: 'panaderia', unidad: 800 },
+  { id: 'rollocanela', nombre: 'Rollos de canela', seccion: 'panaderia', unidad: 800, plural: 'rollos de canela' },
   { id: 'empanada',   nombre: 'Empanadas',    seccion: 'panaderia', unidad: 1800 },
 
   /* Lácteos */

@@ -57,6 +57,18 @@ doble clic, sin nada instalado.
 
 ---
 
+## Licencia y créditos
+
+Este material se distribuye con licencia
+**[Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.es)**:
+puedes copiarlo, adaptarlo y compartirlo **sin fines comerciales**, citando la
+autoría y manteniendo esta misma licencia. Ver [LICENSE](LICENSE).
+
+Los símbolos pictográficos de los productos son propiedad del **Gobierno de
+Aragón**, fueron creados por **Sergio Palao** para **[ARASAAC](https://arasaac.org)**
+y se distribuyen con licencia Creative Commons (BY-NC-SA). Es esa licencia la
+que obliga a que el juego entero se publique con las mismas condiciones.
+
 Las imágenes del dinero provienen del *Cuadernillo de manejo de dinero*
 (teocognitiva, Terapia Ocupacional), que usa el curso: los estudiantes tienen
 que reconocer el dinero real.

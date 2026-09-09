@@ -59,7 +59,9 @@ tanto `index.html` como la lista `JS` de `construir.py`.
 | `js/feria.js` | Feria en parejas (dos tablets por puesto) |
 | `js/aula.js` | Modo aula: pantalla del profesor y de los estudiantes |
 | `js/app.js` | Arranque, navegación, panel «Preparar la actividad» |
-| `img/` | Monedas y billetes (únicas imágenes raster; el resto es SVG) |
+| `img/billetes`, `img/monedas` | El dinero, del cuadernillo del curso |
+| `img/productos/` | Los 51 pictogramas de ARASAAC, uno por producto |
+| `js/svg.js` | Qué pictograma le toca a cada producto |
 | `aula/` | Servidor Python + copia del juego (respaldo del modo aula) |
 | `electron/` | La app de escritorio: ventana, menú y el servidor de aula en Node |
 
@@ -85,6 +87,12 @@ tanto `index.html` como la lista `JS` de `construir.py`.
    usan y están verificados. Cada módulo va en su propio `<script>`.
 5. **El diseño del dinero es intocable.** Las imágenes salieron del cuadernillo
    oficial que usa el curso; los estudiantes deben reconocer el dinero real.
+6. **La atribución de ARASAAC no se toca.** Los pictogramas son CC BY-NC-SA:
+   obligan a citar a Sergio Palao, ARASAAC y la licencia, y a distribuir el
+   juego con esa misma licencia. La cita vive en tres sitios y los tres tienen
+   que sobrevivir: la cabecera de `js/svg.js`, el panel «Créditos» de
+   *Cómo se juega* (`index.html`) y el archivo `LICENSE`. Por lo mismo, el
+   juego **no puede usarse con fines comerciales**.
 
 ---
 
@@ -202,15 +210,25 @@ equivocado (ver abajo). Conviene mantener esa costumbre.
 
 ## Cosas pendientes o que conviene saber
 
-- **La manzana marca hacia dónde va el dibujo.** El profesor entregó un dibujo
-  con contorno negro grueso; los otros 56 productos son planos, sin línea. Ya
-  está decidido: **el contorno se queda y son los demás los que tienen que
-  parecerse a ella**, no al revés. Es trabajo de diseño pendiente, a hacer de
-  una vez sobre todo el catálogo (`js/svg.js`), no producto por producto.
+- **Los dibujos de los productos ya son pictogramas de ARASAAC.** Se probaron
+  las dos vías —redibujar a mano en SVG o usar los pictogramas— y se eligió la
+  segunda: son de un mismo autor (más parejos que 51 dibujos hechos a mano),
+  tienen el trazo negro que hacía falta para que los productos claros no
+  desaparezcan sobre el crema de las tarjetas, y resuelven de una vez el estilo
+  que marcaba la manzana. El costo es el peso: el archivo único pasó de 514 KB
+  a ~1,2 MB.
+  El mapa producto → pictograma está en `js/svg.js`, y **está curado a mano**:
+  el buscador de ARASAAC responde por palabra y devolvía «papá» para papa, el
+  pronombre «tú» para té y la mancha del color para naranja. Si se agrega un
+  producto, hay que **mirar** el pictograma antes de darlo por bueno.
 - **El billete de $1.000 tiene un defecto** heredado de la extracción del PDF
-  original: un rectángulo gris «quemado» en el borde derecho, visible a
-  resolución nativa. Ya existe una versión reparada por *inpainting* que se usó
-  en el cuadernillo imprimible, pero **no se aplicó al juego**. Falta hacerlo.
+  original: un rectángulo gris «quemado» en el borde derecho. Aquí decía que
+  ya existía una versión reparada por *inpainting* en el cuadernillo
+  imprimible: **no es así**. Se revisaron las dos copias del billete que lleva
+  dentro `Cuadernillo de dinero chileno.pdf` (550×279 y 654×306) y las dos
+  traen el mismo parche, más visible aún al doble de tamaño. No hay ningún
+  otro archivo del $1.000 en el proyecto. Ese arreglo hay que **rehacerlo**,
+  no copiarlo de ninguna parte.
 - **Redes con aislamiento de clientes.** Algunas redes escolares impiden que las
   tablets vean el computador del profesor. Solución documentada: hotspot del
   celular o pedir a informática que lo desactive. No se ha probado en la sala
